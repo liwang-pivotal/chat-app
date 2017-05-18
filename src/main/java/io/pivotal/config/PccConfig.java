@@ -1,11 +1,10 @@
-package io.pivotal;
+package io.pivotal.config;
 
 import io.pivotal.domain.Member;
 import io.pivotal.domain.Message;
 import io.pivotal.listener.MemberListener;
 import io.pivotal.listener.MessageListener;
-import io.socket.client.IO;
-import io.socket.client.Socket;
+import io.pivotal.spring.cloud.service.gemfire.GemfireServiceConnectorConfig;
 
 import org.apache.geode.cache.Region;
 import org.apache.geode.cache.client.ClientCache;
@@ -14,41 +13,49 @@ import org.apache.geode.cache.client.ClientRegionFactory;
 import org.apache.geode.cache.client.ClientRegionShortcut;
 import org.apache.geode.pdx.ReflectionBasedAutoSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.Cloud;
+import org.springframework.cloud.CloudFactory;
+import org.springframework.cloud.config.java.AbstractCloudConfig;
+import org.springframework.cloud.service.ServiceConnectorConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class ChatDemoConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class PccConfig extends AbstractCloudConfig {
 
 	@Autowired
 	private ClientCache clientCache;
-
-	@Bean(name = "gemfireCache")
-	public ClientCache clientCache() {
-		ClientCacheFactory ccf = new ClientCacheFactory();
-		ccf.addPoolLocator("localhost", 10334);
-		ccf.setPdxSerializer(new ReflectionBasedAutoSerializer(".*"));
-		ccf.setPdxReadSerialized(false);
-		ccf.setPoolSubscriptionEnabled(true);
-
-		ClientCache clientCache = ccf.create();
-
-		return clientCache;
-	}
 	
-	@Bean
-	public Socket createSocket() throws Exception {
-		Socket socket = IO.socket("http://localhost:3000");
-		socket.connect();
-		
-		return socket;
-	}
+//	@Bean(name = "gemfireCache")
+//	public ClientCache clientCache() {
+//		ClientCacheFactory ccf = new ClientCacheFactory();
+//		ccf.addPoolLocator("localhost", 10334);
+//		ccf.setPdxSerializer(new ReflectionBasedAutoSerializer(".*"));
+//		ccf.setPdxReadSerialized(false);
+//		ccf.setPoolSubscriptionEnabled(true);
+//
+//		ClientCache clientCache = ccf.create();
+//
+//		return clientCache;
+//	}
 
+	public ServiceConnectorConfig createGemfireConnectorConfig() {
+        GemfireServiceConnectorConfig gemfireConfig = new GemfireServiceConnectorConfig();
+        gemfireConfig.setPoolSubscriptionEnabled(true);
+        gemfireConfig.setPdxSerializer(new ReflectionBasedAutoSerializer(".*"));
+        gemfireConfig.setPdxReadSerialized(false);
+
+        return gemfireConfig;
+    }
+    
+	@Bean(name = "gemfireCache")
+    public ClientCache getGemfireClientCache() throws Exception {			
+		Cloud cloud = new CloudFactory().getCloud();
+		ClientCache clientCache = cloud.getSingletonServiceConnector(ClientCache.class,  createGemfireConnectorConfig());
+
+        return clientCache;
+    }
+	
 	@SuppressWarnings("unchecked")
 	@Bean(name = "messagesRegion")
 	public Region<String, Message> messagesRegion(@Autowired MessageListener messageListener) {
@@ -72,15 +79,5 @@ public class ChatDemoConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		
 		return membersRegion;
 	}
-	
-	@Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-    }
-
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket").withSockJS();
-    }
 
 }

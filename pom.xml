@@ -41,13 +41,19 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.socket</groupId>
-			<artifactId>socket.io-client</artifactId>
-			<version>0.8.3</version>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>io.pivotal.spring.cloud</groupId>
+			<artifactId>spring-cloud-gemfire-cloudfoundry-connector</artifactId>
+			<version>1.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>io.pivotal.spring.cloud</groupId>
+			<artifactId>spring-cloud-gemfire-spring-connector</artifactId>
+			<version>1.1.0.RELEASE</version>
 		</dependency>
 	</dependencies>
 
@@ -57,50 +63,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			
-			<plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.4</version>
-                
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-				 	</execution>
-
-					<execution>
-						<id>npm install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-				
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>webpack build</id>
-						<goals>
-							<goal>webpack</goal>
-						</goals>
-						
-						<configuration>
-							<arguments>-p</arguments>
-						</configuration>
-					</execution>
-					
-				</executions>
-				<configuration>
-					<workingDirectory>src/main/js</workingDirectory>
-					<nodeVersion>v6.10.2</nodeVersion>
-				</configuration>
-            </plugin>
 		</plugins>
 	</build>
-	
 
 </project>
