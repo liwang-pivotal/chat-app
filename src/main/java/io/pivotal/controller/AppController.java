@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,11 +24,18 @@ public class AppController {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
+    private SimpMessagingTemplate webSocket;
+	
+	@Autowired
 	private MemberRepository memberRepository;
 	
 	@Autowired
 	private MessageRepository messageRepository;
 	
+	@RequestMapping(method = RequestMethod.GET, path = "/test")
+	public void test() throws Exception {
+		webSocket.convertAndSend("/topic/test", "disconnect");
+	}
 	
 	@RequestMapping(method = RequestMethod.GET, path = "/members")
 	@ResponseBody

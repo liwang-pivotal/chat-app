@@ -1,8 +1,7 @@
 ---
 applications:
 - name: chat-demo
-  routes:
-  - route: chat-demo-lowering-authorizer.apps.excelsiorcloud.com
+  random-route: true
   path: target/chat-demo-0.0.1-SNAPSHOT.jar
   buildpack: java_buildpack_offline
   services:

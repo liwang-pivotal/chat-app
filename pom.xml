@@ -57,6 +57,14 @@
 		</dependency>
 	</dependencies>
 
+	<repositories>
+		<repository>
+			<id>spring-repository</id>
+			<name>Spring Repository</name>
+			<url>http://repo.spring.io/libs-release</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
